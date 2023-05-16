@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 
 // Create an empty array to store restaurant data
-const restaurants = [];
+const restaurants = [{ name: "Uchi", style: "Asian", price: "$$$$" }];
 
 // Routes go here
 

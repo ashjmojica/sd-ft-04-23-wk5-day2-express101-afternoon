@@ -2,57 +2,55 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-
 // Create an empty array to store restaurant data
-const restaurants = [{ name: "Uchi", style: "Asian", price: "$$$$" }];
+let restaurants = [
+  { name: "Uchi", style: "Asian", price: "$$$$" },
+  { name: "Smoochi", style: "Asian", price: "$$$$" },
+];
 
 // Routes go here
-// Route to add a new restaurant
-app.post("/restaurants", (req, res) => {
-  const newRestaurant = { name: "McDonalds", style: "American", price: "$" };
-  restaurants.push(newRestaurant);
-  res.send(newRestaurant);
-});
 
-// Route to update an existing restaurant
-app.put('/restaurants/:id', (req, res) => {
-  const restaurantId = req.params.id;
-  const updatedRestaurant = req.body;
-  
-  const restaurant = restaurants.find(restaurant => restaurant.id === restaurantId);
-
-  if (!restaurant) {
-    res.status(404).json({ message: "Restaurant not found" });
-  } else {
-    // Update the restaurant
-    Object.assign(restaurant, updatedRestaurant);
-    res.json({ message: "Restaurant updated successfully" });
-  }
-});
-
-// Route to delete a restaurant
-app.post('/restaurants/:id', (req, res) => {
-  const restaurantId = req.params.id;
-
-  const restaurantIndex = restaurants.findIndex(restaurant => restaurant.id === restaurantId);
-
-  if (restaurantIndex === -1) {
-    res.status(404).json({ message: "Restaurant not found" });
-  } else {
-    // Remove the restaurant from the array
-    restaurants.splice(restaurantIndex, 1);
-    res.json({ message: "Restaurant deleted successfully" });
-  }
-});
-
-
-// Route to get all restaurants
-app.get('/restaurants', (req, res) => {
+// view all restaurants
+app.get("/view_restaurants", (req, res) => {
   res.json(restaurants);
 });
+// create a restaurant
+app.post("/create_restaurant", (req, res) => {
+  restaurants.push(req.body);
+  res.send(`Added new restaurant called ${req.body.name}`);
+});
 
+app.put("/update_restaurant", (req, res) => {
+  const indexOfRestaurantToUpdate = restaurants.findIndex(
+    (restaurant) => restaurant.name === req.body.name
+  );
+  if (indexOfRestaurantToUpdate === -1) {
+    res
+      .status(404)
+      .send("That restaurant does not exist, please consider adding it!");
+  } else {
+    if (req.body.name && req.body.price && req.body.style) {
+      restaurants[indexOfRestaurantToUpdate].name = req.body.nameToUpdateTo;
+      restaurants[indexOfRestaurantToUpdate].price = req.body.price;
+      restaurants[indexOfRestaurantToUpdate].style = req.body.style;
+      res.send(
+        `This is your newly updated restaurant ${restaurants[indexOfRestaurantToUpdate].name}`
+      );
+    } else {
+      res.send("You need to provide a name and a price and a style.");
+    }
+  }
+});
 
+// delete a restaurant
+app.post("/delete_restaurant", (req, res) => {
+  const filteredRestaurants = restaurants.filter(
+    (resta) => resta.name !== req.body.name
+  );
+  restaurants = filteredRestaurants;
+  res.send(restaurants);
+});
 // Start the server
-app.listen(3000, () => {
+app.listen(3003, () => {
   console.log("Server is running on port 3000");
 });
